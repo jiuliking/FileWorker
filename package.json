@@ -24,6 +24,7 @@
     "axios": "^1.6.8",
     "codemirror": "^6.0.1",
     "cookie": "^0.6.0",
+    "element-plus": "^2.9.0",
     "js-cookie": "^3.0.5",
     "mdui": "^2.0.6",
     "mime": "^4.0.1",
