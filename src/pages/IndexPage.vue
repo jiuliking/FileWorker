@@ -4,16 +4,10 @@ import useI18nStore from "../store/i18n";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-
 const i18nStore = useI18nStore();
-let updateLocale = (locale: string) => {
-  i18nStore.setLocale(locale);
-};
 
-const { locale } = useI18n();
-if (i18nStore.locale !== "") {
-  locale.value = i18nStore.locale;
-}
+// 从 i18n 实例获取可用语言列表
+const { availableLocales } = useI18n();
 
 let onClipAreaClick = () => {
   router.push("/clip");
@@ -25,29 +19,43 @@ let onUploadClick = () => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center">
+  <div class="flex flex-col items-center pt-10">
     <div class="pannel file-pannel">
-      <div class="text-2xl flex flex-row items-center">
-        <router-link to="/filemanage" class="link-hint">{{ $t("index.file_channel_title") }}</router-link>
+      <div class="text-xl font-medium mb-4 flex justify-between items-center">
+        <span>{{ $t("index.file_channel_title") }}</span>
+        <router-link to="/filemanage" class="link-hint">{{ $t('index.manage_link') }}</router-link>
       </div>
-      <div class="upload-area" @click="onUploadClick"></div>
+      <div class="upload-area" @click="onUploadClick">
+        <div class="area-content">
+          <span class="text-lg">{{ $t('index.upload_area_text') }}</span>
+          <span class="text-sm text-gray-400">{{ $t('index.upload_area_hint') }}</span>
+        </div>
+      </div>
     </div>
     <div class="pannel clip-pannel">
-      <div class="text-2xl flex flex-row items-center">
-        <router-link to="/filemanage" class="link-hint">{{ $t("index.clip_channel_title") }}</router-link>
+      <div class="text-xl font-medium mb-4 flex justify-between items-center">
+        <span>{{ $t("index.clip_channel_title") }}</span>
       </div>
-      <div class="clip-area" @click="onClipAreaClick"></div>
+      <div class="clip-area" @click="onClipAreaClick">
+        <div class="area-content">
+          <span class="text-lg">{{ $t('index.clip_area_text') }}</span>
+          <span class="text-sm text-gray-400">{{ $t('index.clip_area_hint') }}</span>
+        </div>
+      </div>
     </div>
-    <!-- <div class="pannel tips-pannel">{{ $t("index.tips_content") }}</div> -->
-    <select v-model="$i18n.locale" class="locale-changer" @change="updateLocale($i18n.locale)">
-      <option v-for="locale in $i18n.availableLocales" :key="`locale-${locale}`" :value="locale">{{ locale }}</option>
+    <select
+      :value="i18nStore.locale"
+      @change="i18nStore.setLocale(($event.target as HTMLSelectElement).value)"
+      class="locale-changer"
+    >
+      <option v-for="locale in availableLocales" :key="`locale-${locale}`" :value="locale">{{ locale }}</option>
     </select>
   </div>
 </template>
 
 <style scoped>
 .pannel {
-  --uno: my-6 px-4 py-4 max-w-screen-md w-4/5 rounded shadow-md;
+  --uno: my-4 p-6 max-w-screen-md w-[90%] sm:w-4/5 bg-white rounded-lg shadow-lg;
 }
 
 .file-pannel {
@@ -59,38 +67,31 @@ let onUploadClick = () => {
 }
 
 .tips-pannel {
-  background-color: #d1e7dd;
+  --uno: bg-gray-100 text-gray-600;
 }
 
 .upload-area {
-  --uno: border-dashed border-1 border-gray-400 h-30 mt-2 cursor-pointer;
-  background: url(../assets/upload.svg) center center no-repeat;
-  background-color: #f8f9fa;
+  --uno: h-36 mt-4 cursor-pointer flex items-center justify-center flex-col text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors;
 }
 
 .clip-area {
-  display: block;
-  width: 100%;
-  --uno: border-dashed border-1 border-gray-400 h-30 mt-2 cursor-pointer;
-  background: url(../assets/clipboard.svg) center center no-repeat;
-  background-color: #f8f9fa;
+  --uno: h-36 mt-4 cursor-pointer flex items-center justify-center flex-col text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors;
+}
+
+.area-content {
+  --uno: flex flex-col items-center;
+}
+
+.area-icon {
+  --uno: w-12 h-12 mb-2 text-gray-400;
 }
 
 .link-hint {
-  text-decoration: underline;
-  text-decoration-style: dashed;
-  text-decoration-color: #a0aec0;
-  text-underline-offset: 0.2em;
-}
-
-.link-hint:hover {
-  text-decoration-color: black;
+  --uno: text-gray-500 hover:text-blue-600 text-sm;
 }
 
 .locale-changer {
-  border: grey 1px solid;
-  border-radius: 6px;
-  padding: 2px 4px;
+  --uno: mt-8 border border-gray-300 rounded-md py-1 px-2 text-sm text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500;
 }
 </style>
 

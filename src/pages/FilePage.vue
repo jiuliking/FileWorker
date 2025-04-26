@@ -3,7 +3,10 @@ import { onMounted, onUnmounted, ref, type Ref } from 'vue';
 import useFileStore from '@/store/file';
 import { formatBytes } from '@/utils/utils';
 import { PutFile } from '@/api';
+import ToastNotification from '@/components/ToastNotification.vue';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const fileStore = useFileStore();
 
 let fileUploadInput = ref();
@@ -21,9 +24,20 @@ interface UploadedFile {
 
 let uploadedFiles: Ref<UploadedFile[]> = ref([]);
 
+const showToast = ref(false);
+const toastMessage = ref('');
+
 const uploadSingle = async (index: number, filename: string, file: File) => {
-  await PutFile(filename, file, fileStore.visibility, "file");
-  uploadedFiles.value[index - 1].done = true;
+  try {
+    await PutFile(filename, file, fileStore.visibility, "file");
+    uploadedFiles.value[index - 1].done = true;
+    toastMessage.value = t('filePage.uploadSuccess', { filename });
+    showToast.value = true;
+  } catch (error) {
+    console.error("Upload failed:", error);
+    toastMessage.value = t('filePage.uploadFailed', { filename });
+    showToast.value = true;
+  }
 }
 
 onMounted(() => {
@@ -118,6 +132,7 @@ onUnmounted(() => {
         <div class="ml-auto w-6 h-6" :class="file.done ? 'i-mdi-check' : 'uploading'"></div>
       </a>
     </div>
+    <ToastNotification :message="toastMessage" v-model:show="showToast" />
   </div>
 </template>
 

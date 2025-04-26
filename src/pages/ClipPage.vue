@@ -8,7 +8,10 @@ import useClipStore from "@/store/clip";
 
 import { PutFile } from "@/api";
 import { getRandomFilename } from "@/utils/utils";
+import ToastNotification from '@/components/ToastNotification.vue';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const code = ref("");
 const modified = ref(false);
 const editorElement = ref();
@@ -52,9 +55,21 @@ let refreshRandomFileName = () => {
 
 const clipStore = useClipStore();
 
+const showToast = ref(false);
+const toastMessage = ref('');
+
 let onSaveBtnClick = async () => {
-  await PutFile(filename.value, code.value, clipStore.visibility, "text");
-  modified.value = false;
+  const currentFilename = filename.value;
+  try {
+    await PutFile(currentFilename, code.value, clipStore.visibility, "text");
+    modified.value = false;
+    toastMessage.value = t('clipPage.saveSuccess', { filename: currentFilename });
+    showToast.value = true;
+  } catch (error) {
+    console.error("Save failed:", error);
+    toastMessage.value = t('clipPage.saveFailed', { filename: currentFilename });
+    showToast.value = true;
+  }
 }
 
 let saveContentKeydown = (e: KeyboardEvent) => {
@@ -107,6 +122,7 @@ onBeforeUnmount(() => {
         <button class="save-btn" @click="onSaveBtnClick">{{ $t('common.save') }}</button>
       </div>
     </div>
+    <ToastNotification :message="toastMessage" v-model:show="showToast" />
   </div>
 </template>
 
