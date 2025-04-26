@@ -13,7 +13,7 @@ const props = defineProps({
 const emit = defineEmits(['update:show']);
 
 const internalShow = ref(props.show);
-let timeoutId: number | undefined;
+let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
 watch(() => props.show, (newValue: boolean) => {
   internalShow.value = newValue;
